@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "run_name": "phaseBASE4_new_run",
+  "scope": "four systems, all single faults including base features, no converted failures",
+  "suite_view": "original",
+  "protocol": "version_context_v1",
+  "manifest_dir": "data/processed/baselines/new_four_system_run/manifests",
+  "products": "data/processed/baselines/new_four_system_run/manifests/products.csv",
+  "tests": "data/processed/baselines/new_four_system_run/manifests/tests.csv",
+  "sources": "configs/baseline_four_sources.local.json",
+  "labels": "data/processed/labels/new_four_system_run",
+  "split_dir": "data/processed/baselines/new_four_system_run/splits_design_v1",
+  "work_dir": "data/processed/baselines/new_four_system_run",
+  "metrics_dir": "outputs/metrics/new_four_system_run",
+  "folds": [
+    "grouped",
+    "loso_BankAccountTP",
+    "loso_Email",
+    "loso_Elevator",
+    "loso_ExamDB"
+  ],
+  "seeds": [
+    20261102,
+    20261103,
+    20261104
+  ],
+  "split_seed": 20261102,
+  "c_grid": [
+    0.1,
+    1.0,
+    10.0
+  ],
+  "models": [
+    "clap6_svm",
+    "pulp50_lr",
+    "pulp50_svm",
+    "pulp50_pu_source",
+    "coverage2_lr"
+  ],
+  "pu_estimators": 30,
+  "pu_sampling_ratio": 0.05,
+  "bootstrap_replicates": 200,
+  "bounds": {
+    "max_versions": 178,
+    "max_products": 4206,
+    "max_tests": 250000,
+    "max_seconds_per_command": 5400,
+    "slicing_seconds": 5400,
+    "slicing_version_seconds": 180,
+    "minimum_free_bytes": 2147483648,
+    "slicing_product_seconds": 120,
+    "coverage_hit_policy": "source_count_only",
+    "observation_workers": 4
+  },
+  "java": "/path/to/java8/bin/java",
+  "slicer": "PULP/plugins/all-statements-slicing.jar",
+  "new_slicing_systems": [
+    "Elevator",
+    "ExamDB"
+  ],
+  "reference_policy": "same_version_original_tests_all_products_observed_outcomes_no_FP_TP",
+  "reuse_observations": false,
+  "paper_original_protocol": "source algorithms, original-suite all-version adaptation; no base-feature/class filtering, grouped/LOSO not original-paper split",
+  "slicing_workers": 6,
+  "source_train_fraction": 0.8,
+  "additional_source_pulp_protocol": "all four system F/U pool; per-version 50D normalization; label-free transductive source comparison, not holdout generalization",
+  "product_checkpoints": true,
+  "export_dir": "outputs/new_four_system_results",
+  "report_prefix": "phaseBASE4_new_run"
+}

@@ -31,7 +31,7 @@ SCORE_FIELDS = ("sample_id", "partition", "model", "seed", "y_score", "y_pred", 
 
 def configuration(path: Path) -> dict:
     config = yaml.safe_load(path.read_text(encoding="utf-8"))
-    if config["suite_view"] != "original" or config["protocol"] != "strict_train_reference_v1":
+    if config["suite_view"] != "original" or config["protocol"] not in {"strict_train_reference_v1", "version_context_v1"}:
         raise ValueError("Only explicitly named strict original-suite protocol is enabled")
     for name in ("products", "tests", "sources", "labels", "split_dir", "work_dir", "metrics_dir"):
         config[name] = (ROOT / config[name]).resolve()
@@ -67,7 +67,8 @@ def prepare(c):
         observations = joblib.load(snapshot)
         print("reusing explicitly requested frozen observation snapshot", flush=True)
     else:
-        observations, evidence = collect(c["products"], c["tests"], c["sources"], c["bounds"])
+        observations, evidence = collect(c["products"], c["tests"], c["sources"], c["bounds"],
+            cache_dir=work/'product_observation_checkpoints' if c.get('product_checkpoints') else None)
         joblib.dump(observations, snapshot, compress=3)
         evidence["snapshot_sha256"] = sha256(snapshot)
         evidence["sources_sha256"] = sha256(c["sources"])
@@ -77,12 +78,34 @@ def prepare(c):
         if [o.identity for o in observations] != ordered:
             raise ValueError("Observation row order differs from canonical product order")
         train = [o for o in observations if split[o.identity]["split"] == "train"]
-        builder = TrainReferenceFeatures().fit(train, split_file(c, fold))
-        arrays = builder.transform(observations)
+        if c["protocol"] == "version_context_v1":
+            # All products of each version are in one partition. Observable F
+            # anchors of the target version are allowed in this named regime.
+            if 'version_arrays' not in locals():
+                version_arrays = {"clap6": [], "pulp50": [], "coverage2": []}
+                version_audits = []
+                from itertools import groupby
+                for group, items in groupby(observations, lambda o: o.identity[:2]):
+                    local = list(items)
+                    builder = TrainReferenceFeatures().fit_version_context(local)
+                    values = builder.transform(local)
+                    for family in version_arrays:
+                        version_arrays[family].extend(values[family])
+                    version_audits.append({"group": group, "products": len(local),
+                        "failing_anchors": sum(o.observed_result == "FAIL" for o in local)})
+                version_arrays = {k: np.asarray(v) for k, v in version_arrays.items()}
+            arrays = version_arrays
+            audit = {"protocol": c["protocol"], "versions": version_audits,
+                "scope": "same-version original outcome context, including target versions; no target FP/TP",
+                "paper_equivalence": "source-rule adapter, not exact original paper evaluation"}
+        else:
+            builder = TrainReferenceFeatures().fit(train, split_file(c, fold))
+            arrays = builder.transform(observations)
+            audit = builder.audit()
         dest = work / fold
         dest.mkdir(parents=True, exist_ok=True)
         np.savez_compressed(dest / "features.npz", **arrays)
-        write_json(dest / "features_audit.json", builder.audit() | {
+        write_json(dest / "features_audit.json", audit | {
             "products_sha256": sha256(c["products"]), "split_sha256": sha256(split_file(c, fold)),
             "features_sha256": sha256(dest / "features.npz"), "sample_ids": [o.sample_id for o in observations]})
         print(f"prepared {fold}: {len(observations)} rows; {len(train)} training references", flush=True)
@@ -206,42 +229,68 @@ def run_all(config_path: Path, c):
         raise ValueError("Final evaluation already exists; use a new declared run ID instead of silently retesting")
     record = {"started_at": datetime.datetime.now().astimezone().isoformat(), "config_sha256": sha256(config_path),
               "commands": [], "python": sys.version, "scope": "phase02 only", "success": False}
-    write_json(ROOT / "outputs/phase02_run.json", record)
+    run_name = c.get("run_name", "phase02")
+    if not run_name.replace('_', '').isalnum():
+        raise ValueError("Invalid run name")
+    record["scope"] = c.get("scope", "phase02 only")
+    receipt = ROOT / "outputs" / (run_name + "_run.json")
+    if receipt.exists():
+        raise ValueError("Run receipt already exists; preserve prior attempt")
+    write_json(receipt, record)
     env = dict(os.environ, PYTHONPATH=str(ROOT / "src"), PYTHONDONTWRITEBYTECODE="1", PYTHONUTF8="1",
                OMP_NUM_THREADS="1", OPENBLAS_NUM_THREADS="1", MKL_NUM_THREADS="1")
-    for stage in ("prepare", "fit", "select", "predict", "evaluate"):
+    stages = ["prepare", "fit"]
+    if c.get('additional_source_pulp_protocol'):
+        stages.append('source_pool')
+    stages += ["select", "predict", "evaluate"]
+    for stage in stages:
         command = [sys.executable, "-X", "utf8", "-B", "-m", "cwm_fp.baselines.pipeline", stage, "--config", str(config_path)]
-        log = ROOT / "outputs" / f"phase02_{stage}.log"
+        log = ROOT / "outputs" / f"{run_name}_{stage}.log"
         start = time.perf_counter()
         stage_code = {p.relative_to(ROOT).as_posix(): sha256(p) for p in sorted((ROOT / "src/cwm_fp/baselines").glob("*.py"))}
         with log.open("w", encoding="utf-8") as output:
-            try:
-                result = subprocess.run(command, cwd=ROOT, env=env, stdout=output, stderr=subprocess.STDOUT,
-                                        timeout=c["bounds"]["max_seconds_per_command"])
-                exit_code, timeout_error = result.returncode, None
-            except subprocess.TimeoutExpired as exc:
-                exit_code, timeout_error = 124, str(exc)
+            import psutil
+            process = subprocess.Popen(command, cwd=ROOT, env=env, stdout=output, stderr=subprocess.STDOUT)
+            monitor = psutil.Process(process.pid)
+            peak_rss, timeout_error = 0, None
+            while process.poll() is None:
+                try:
+                    peak_rss = max(peak_rss, monitor.memory_info().rss)
+                except psutil.NoSuchProcess:
+                    pass
+                if time.perf_counter()-start > c['bounds']['max_seconds_per_command']:
+                    timeout_error = 'command_time_limit'
+                if peak_rss > c['bounds'].get('max_worker_rss_bytes', 8*1024**3):
+                    timeout_error = 'worker_rss_limit'
+                if timeout_error:
+                    process.kill(); process.wait(); break
+                time.sleep(.2)
+            exit_code = 124 if timeout_error else process.returncode
         record["commands"].append({"argv": command, "exit_code": exit_code, "seconds": round(time.perf_counter()-start, 3),
                                    "log": log.as_posix(), "sha256": sha256(log), "timeout_error": timeout_error,
-                                   "code_sha256": stage_code})
-        write_json(ROOT / "outputs/phase02_run.json", record)
+                                   "code_sha256": stage_code, "peak_worker_rss_bytes": peak_rss,
+                                   "memory_scope": "direct Python worker RSS, 0.2s polling; not OS hard quota"})
+        write_json(receipt, record)
         print(f"{stage}: exit={exit_code}, seconds={record['commands'][-1]['seconds']}", flush=True)
         if exit_code:
             raise RuntimeError(f"Phase02 {stage} failed: {log}")
     record["completed_at"] = datetime.datetime.now().astimezone().isoformat()
     record["success"] = True
-    write_json(ROOT / "outputs/phase02_run.json", record)
+    write_json(receipt, record)
 
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=["run", "prepare", "fit", "select", "predict", "evaluate"])
+    parser.add_argument("action", choices=["run", "prepare", "fit", "source_pool", "select", "predict", "evaluate"])
     parser.add_argument("--config", type=Path, default=ROOT / "configs/baselines.yaml")
     a = parser.parse_args(argv)
     try:
         c = configuration(a.config)
         if a.action == "run":
             run_all(a.config.resolve(), c)
+        elif a.action == 'source_pool':
+            from .source_pool import fit_source_pool
+            fit_source_pool(c)
         elif a.action in {"select", "evaluate"}:
             from .evaluator import evaluate, select
             install_io_guard("evaluator")

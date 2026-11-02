@@ -97,7 +97,7 @@ def require_training_keys(keys, splits_path: Path, operation: str) -> None:
         raise ValueError(f"{operation}: all contributors must belong to TRAIN")
 
 
-def build_all(products_path: Path, tests_path: Path, out: Path, seed: int) -> dict:
+def build_all(products_path: Path, tests_path: Path, out: Path, seed: int, *, source_train_fraction=None) -> dict:
     products = indexed(read_csv(products_path, KEY))
     tests = read_csv(tests_path, (*KEY, "test_id"))
     present = {k[0] for k in products}
@@ -115,7 +115,13 @@ def build_all(products_path: Path, tests_path: Path, out: Path, seed: int) -> di
             continue
         # Insufficient group data must be explicit, never a fallback product split.
         try:
-            rows = make_split(products_path, "loso" if holdout else "grouped", seed, holdout)
+            fractions = {}
+            if holdout and source_train_fraction is not None:
+                if not 0 < source_train_fraction < 1:
+                    raise ValueError("Invalid source train fraction")
+                fractions = {'train_frac': .85 * source_train_fraction,
+                             'val_frac': .85 * (1-source_train_fraction)}
+            rows = make_split(products_path, "loso" if holdout else "grouped", seed, holdout, **fractions)
         except ValueError as exc:
             if file.exists():
                 raise ValueError(f"Stale split for unavailable groups; use a fresh output directory: {file}") from exc
@@ -130,6 +136,7 @@ def build_all(products_path: Path, tests_path: Path, out: Path, seed: int) -> di
             "products": dict(Counter(r["split"] for r in rows)),
             "versions": dict(Counter(g[2] for g in groups)), "tests": test_counts,
             "split_id": f"{name}:seed={seed}:{sha256(file)}", "version_overlap": 0}
+    result['source_train_fraction'] = source_train_fraction
     write_json(out / "split_audit.json", result)
     return result
 

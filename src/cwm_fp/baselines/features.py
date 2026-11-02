@@ -34,6 +34,10 @@ def sorted_paths(paths):
 class TrainReferenceFeatures:
     def fit(self, observations: list[Observation], split_path):
         require_training_keys([o.identity for o in observations], split_path, "suspiciousness")
+        return self._build(observations)
+
+    def _build(self, observations: list[Observation], *, spectrum_failing_only=False):
+        """Internal calculation; public fit enforces its declared evidence scope."""
         self.train_ids = {o.identity for o in observations}
         self.systems = {}
         self.risk_cache, self.query_cache, self.reference_similarity_cache = {}, {}, {}
@@ -43,14 +47,15 @@ class TrainReferenceFeatures:
         self.formulas = [getattr(module, f"{name}_calculation") for name in FORMULAS]
         for system in sorted({o.identity[0] for o in observations}):
             local = [o for o in observations if o.identity[0] == system]
-            vocabulary = sorted(frozenset().union(*(o.present for o in local)))
+            spectrum = [o for o in local if o.observed_result == "FAIL"] if spectrum_failing_only else local
+            vocabulary = sorted(frozenset().union(*(o.present for o in (spectrum or local))))
             failed, passed = Counter(), Counter()
-            for o in local:
+            for o in spectrum:
                 for path in o.failed:
                     failed.update(path)
                 for path in o.passed:
                     passed.update(path)
-            nf, npass = sum(len(o.failed) for o in local), sum(len(o.passed) for o in local)
+            nf, npass = sum(len(o.failed) for o in spectrum), sum(len(o.passed) for o in spectrum)
             raw = np.array([[fn(failed[s], passed[s], nf, npass) for fn in self.formulas] for s in vocabulary], dtype=float)
             low, high = raw.min(axis=0), raw.max(axis=0)
             normalized = (raw - low) / np.where(high > low, high - low, 1)
@@ -72,6 +77,18 @@ class TrainReferenceFeatures:
             self.systems[system]["denominator_cache"] = {}
             self.systems[system]["ratio_cache"] = {}
         return self
+
+
+    def fit_version_context(self, observations: list[Observation]):
+        """Explicit target-version context, never a strict-inductive fit.
+
+        Only observed original outcomes/coverage/slices are accepted by the
+        Observation schema. Calling this does not allow any FP/TP oracle input.
+        A separate instance per version prevents cross-version identity merging.
+        """
+        if len({o.identity[:2] for o in observations}) != 1:
+            raise ValueError("Version context must contain exactly one complete version")
+        return self._build(observations, spectrum_failing_only=True)
 
     def _reflection(self, failed: Counter, passed: Counter, query: list[frozenset]):
         # Equivalent to the source's two successive >threshold Jaccard filters,

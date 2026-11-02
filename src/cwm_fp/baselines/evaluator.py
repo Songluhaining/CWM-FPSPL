@@ -12,7 +12,7 @@ from cwm_fp.data.common import KEY, indexed, read_csv, sha256, write_csv, write_
 from cwm_fp.data.labels import load_targets
 from .pipeline import SCORE_FIELDS, context, split_file
 
-RESULT_FIELDS = (*SCORE_FIELDS, "split_id", "y_true", "system_id", "bug_version_id", "origin")
+RESULT_FIELDS = (*SCORE_FIELDS, "split_id", "y_true", "system_id", "bug_version_id", "product_id", "origin")
 
 
 def binary_metrics(y, scores, pred, kind="margin") -> dict:
@@ -142,7 +142,7 @@ def evaluate(c):
                     if p["partition"] != splits[k]["split"] or p["model"] != name or int(p["seed"]) != seed:
                         raise ValueError("Prediction partition/model identity mismatch")
                     rows.append(p | {"seed": seed, "y_score": float(p["y_score"]), "y_pred": int(p["y_pred"]),
-                        "split_id": split_id, "system_id": k[0], "bug_version_id": k[1], **labels[k]})
+                        "split_id": split_id, "system_id": k[0], "bug_version_id": k[1], "product_id": k[2], **labels[k]})
                 dest = c["metrics_dir"] / fold / str(seed)
                 write_csv(dest / (name + ".csv"), rows, RESULT_FIELDS)
                 partitions = {}
@@ -172,10 +172,20 @@ def evaluate(c):
         for name in c["models"]:
             values = [s["partitions"]["test"] for s in summaries if s["fold"] == fold and s["model"] == name]
             aggregated.append({"fold": fold, "model": name, "n_test": values[0]["n"],
-                "seed_mean_std": {metric: {"mean": float(np.mean([v[metric] for v in values])),
-                                           "std": float(np.std([v[metric] for v in values], ddof=1))}
+                "seed_mean_std": {metric: seed_summary([v[metric] for v in values])
                                   for metric in ("fp_precision", "fp_recall", "fp_f1", "pr_auc", "average_precision", "roc_auc", "balanced_accuracy", "accuracy")}})
     write_json(c["metrics_dir"] / "summary.json", {"protocol": c["protocol"], "suite_view": "original", "seeds": c["seeds"],
         "test_evaluations_per_seed_fold_model": 1, "runs": len(summaries), "aggregate": aggregated,
-        "paper_original": c["paper_original_protocol"], "missing_loso_systems": ["Elevator", "ExamDB", "GPL", "ZipMe"],
-        "limitations": ["unverified local fault-location proxy labels", "not the paper 823-version subset", "simulated suite disabled; simulated metrics unavailable", "50D train-reference adaptation, not exact paper feature extraction", "LOSO semantic priors cannot match unseen systems"]})
+        "paper_original": c["paper_original_protocol"],
+        "missing_loso_systems": [s for s in ("BankAccountTP", "Email", "Elevator", "ExamDB", "GPL", "ZipMe") if "loso_"+s not in c["folds"]],
+        "limitations": ["benchmark source membership oracle, not independent failure discovery", "not the paper 823-version subset", "original suites only; simulated suite disabled", "source-rule feature adapter, not exact paper evaluation"] +
+            (["LOSO semantic priors cannot match unseen systems"] if c['protocol']=='strict_train_reference_v1' else
+             ["target-version observable failing context allowed; not strict no-target-context induction"]),
+        "base_feature_exclusion": False if c['protocol']=='version_context_v1' else None})
+
+
+def seed_summary(values):
+    available = [v for v in values if v is not None]
+    return {"mean": float(np.mean(available)) if available else None,
+            "std": float(np.std(available, ddof=1)) if len(available)>1 else None,
+            "available_seeds": len(available), "requested_seeds": len(values)}
