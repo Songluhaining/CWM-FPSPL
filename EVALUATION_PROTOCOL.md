@@ -1,5 +1,13 @@
 # Non-Leaking Evaluation Protocol
 
+## Existing-model matched holdout evaluation (EVAL1, 2026-11-02)
+
+The user authorized evaluating the existing runnable graph classifier against baselines. `matched_04R1_holdout_v1` retains all 28 products and the original 17/5/6 split. Nine already selected neural checkpoints and two frozen statistical models are restored without fitting or reselection. Their old validation outputs must reproduce within a predeclared absolute tolerance of 1e-6; parameters must remain unchanged.
+
+Four supervised tabular controls use the same 17 PASS labels and 5 validation / 6 test products, with BASE4 version-context features and its fixed C grid. Same labeled cohort does not mean identical context: CLAP/PULP features may use observable failures in target versions, and their TRAIN scaler includes 91 original F references. Exact17 source PU cannot sample a negative at its unchanged 5% ratio; a separately declared comparison uses 215 unlabeled PASS and 91 F from the same nine TRAIN versions, never held-out versions. Do not merge this information difference into an architecture-only claim.
+
+All 26 model/seed prediction groups are sealed before TEST labels are joined by the evaluator. Prior Bank/Email development and BASE4 overlap are disclosed. Six test products from three versions, with only one FP, are a limited pilot and not a four-system or causal-world-model evaluation. Current R-GCN test F1 is 0.6667 versus 1.0000 for CLAP and PULP50-SVM on that cohort. No post-test threshold adjustment, new fit, or checkpoint reselection is allowed within this run. Details and actual evidence: `outputs/phaseEVAL1_review_packet.md`.
+
 ## Four-system baseline execution (BASE4, 2026-11-02)
 
 The tabular baseline portion has now executed on all 178 single-fault versions and 4206 products, without base-feature or single-class exclusion. This does not mean the unified graph/world model comparison has executed. Frozen artifacts and actual outcomes are documented in `outputs/phaseBASE4_review_packet.md`.
@@ -16,7 +24,7 @@ The active first comparison is limited to BankAccountTP, Email, Elevator and Exa
 
 Report strict inductive and target-version-context baseline regimes separately. Original CLAP/PULP feature construction may use observable failing products in the target version; silently removing that information and filling features with zeros is not an original-method reproduction. Target FP/TP truth never becomes a feature or fitting input. Freeze the method across outer folds before seeing target scores, and disclose prior BankAccountTP/Email development exposure.
 
-New comparative experiments have not run. Historical sections below retain their original scope and measurements.
+The unified graph/world-model comparison has not run. BASE4 tabular experiments and the separate EVAL1 existing-classifier pilot are described above. Historical sections below retain their original scope and measurements.
 
 ## 阶段02实际执行范围
 
