@@ -1,0 +1,1 @@
+{"system_id": "SyntheticA", "bug_version_id": "synthetic-v1", "product_id": "p1", "test_id": "T1", "tier": "GRAPH", "nodes": [{"id": "s1", "type": "statement"}, {"id": "s2", "type": "statement"}], "edges": [{"source": "s1", "target": "s2", "type": "control_dep", "evidence": "static"}], "provenance": {"producer": "synthetic_example", "coverage_only": false}}
