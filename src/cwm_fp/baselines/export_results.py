@@ -151,7 +151,7 @@ def export(c):
     product_status=[{**dict(zip(KEY,k)),'sample_id':p['sample_id'],'original_result':p['observed_result'],
         'tests':int(p['test_count']),'features_complete':True,'binary_target_eligible':p['observed_result']=='PASS',
         'exclusion_reason':'observed_failure_not_FP_TP_target' if p['observed_result']=='FAIL' else '',
-        'evidence_file':'outputs/phaseBASE4_results/product_predictions.csv'} for k,p in sorted(products.items())]
+        'evidence_file':(c['work_dir']/'observations_audit.json').relative_to(ROOT).as_posix()} for k,p in sorted(products.items())]
     prefix=c.get('report_prefix','phaseBASE4')
     write_csv(ROOT/'outputs'/f'{prefix}_product_status.csv',product_status,product_status[0].keys())
     write_csv(ROOT/'outputs'/f'{prefix}_graph_status.csv',[],(*KEY,'test_id','status','reason','evidence_file'))

@@ -1,6 +1,16 @@
 # Non-Leaking Evaluation Protocol
 
-## Current four-system design (not yet executed)
+## Four-system baseline execution (BASE4, 2026-11-02)
+
+The tabular baseline portion has now executed on all 178 single-fault versions and 4206 products, without base-feature or single-class exclusion. This does not mean the unified graph/world model comparison has executed. Frozen artifacts and actual outcomes are documented in `outputs/phaseBASE4_review_packet.md`.
+
+The named regime `version_context_v1` allows each target version's observed original test outcomes, coverage and static slices to construct its own reference context. It never uses target FP/TP truth. Version identities do not share reference state. Spectrum statistics use only original failing products within that version. Classifier/scaler fitting uses TRAIN only, regularization selection uses VAL only, and held-out predictions are sealed before TEST evaluation. It is not a strict no-target-context inductive experiment. New version-grouped splits use seed 20261102 and proportions 70/15/15; whole-system holdouts split source versions 80/20. Historical splits remain unchanged.
+
+Five fixed method families and three seeds (20261102/03/04) yield 75 selected evaluations. Three tunable tabular methods use C in {0.1, 1, 10}, with ties selecting the first ascending C on validation FP F1; source CLAP uses fixed linear SVM C=1. Source PULP retains its 30-estimator, 5%-sampled-negative, accuracy-weighted implementation. This source algorithm differs from the paper's stated balanced-sampling/out-of-bag description; do not label it as an exact paper reproduction.
+
+A separate `source_pool_transductive_v1` run fits original PULP F/U learning to the whole observable pool, with per-version feature normalization, without FP/TP fitting targets. Its results are separate from the holdout ranking. Original FAIL products remain F; only the 2756 original PASS products are FP/TP targets. No failing tests are removed. Undefined single-class areas are null. Three-seed variation and 200-replicate version-cluster confidence intervals are reported; seeds do not represent independent dataset splits. No thresholds or hyperparameters are adjusted after test scores are opened.
+
+## Four-system design context
 
 The active first comparison is limited to BankAccountTP, Email, Elevator and ExamDB single-fault data. See `outputs/phaseDESIGN1_review_packet.md`, section 7. It specifies a new version-grouped protocol and four whole-system holdout folds; old frozen splits are not rewritten. Match CLAP/PULP benchmark labels to the actual suite view rather than designing new labels.
 

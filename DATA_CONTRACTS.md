@@ -1,5 +1,15 @@
 # Data Contracts — Canonical Interfaces (v0.12)
 
+## 四系统全量传统基线增补（BASE4，2026-11-02）
+
+新增独立基线产物 `data/processed/baselines/four_systems_v1/`，历史图、标签和划分不变。全部178个单缺陷版本、4206产品及244772条原始测试覆盖记录进入清单；基础特征缺陷和单类版本不得过滤。原始失败产品保留为可观察参考，不成为FP/TP二分类目标。封存标签使用原PULP特征与聚合源码位置成员规则，原始失败不转换，标签与来源字段不进入特征。
+
+`version_context_v1` 为明确声明的“同一版本可观察测试上下文”：每版本独立构建覆盖与静态切片参考，排序统计仅使用该版本原始失败产品的测试。包括目标版本的可观察上下文，但不读取其FP/TP目标。分类器与外层缩放器仍仅在训练分区拟合。`source_pool_transductive_v1` 单列全量无标签池PULP源码算法，不宣称留出泛化。
+
+本次使用 `source_count_only` 覆盖规则，仅原XML的 `count>0` 计入执行集合，与CLAP/PULP源读取规则一致。只有分支计数的记录另计诊断；实际 `count>0` 的位置缺失映射继续报错，不猜测补齐。旧 `all_counts` 默认语义保留。
+
+静态切片缓存绑定真实源码、分析种子集合、切片JAR与Java运行依赖。逐产品观测检查点绑定产品/测试记录及数据摘要，恢复时重新核验覆盖、切片与源码内容。静态切片仍是近似静态分析，不是动态定义使用证据。结果CSV保留完整身份和评价口径；标签与缺陷来源仅在独立导出器及评价器使用，不能回流拟合。详细结果与限制见 `outputs/phaseBASE4_review_packet.md`。
+
 ## 阶段05A增补：物理观测前缀（2026-11-01）
 
 新增独立格式`physical_prefix_dataset_v1`，不重解释既有完整图或旧`prefix_observation_contract_v1`。生产入口为`cwm_fp.models.prefix_dataset`，输入重建为`prefix_reader.load_prefix`；任务字段和目标先冻结在`outputs/phase05A_protocol.json`。真实数据位于`D:/dataset/whn/cwm_fp_generated/data/processed/prefix/phase05A_v1/`。历史数据和旧源码备份保留。
