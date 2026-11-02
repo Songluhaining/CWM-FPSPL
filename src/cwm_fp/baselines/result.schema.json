@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "阶段02仅评价端可连接真值的逐产品结果",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["sample_id", "split_id", "partition", "model", "seed", "y_true", "y_score", "y_pred", "system_id", "bug_version_id", "origin", "score_kind"],
+  "properties": {
+    "sample_id": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "split_id": {"type": "string", "minLength": 1},
+    "partition": {"enum": ["train", "val", "test"]},
+    "model": {"enum": ["clap6_svm", "pulp50_lr", "pulp50_svm", "pulp50_pu_source", "coverage2_lr"]},
+    "seed": {"type": "integer"},
+    "y_true": {"enum": [0, 1]},
+    "y_score": {"type": "number"},
+    "y_pred": {"enum": [0, 1]},
+    "system_id": {"type": "string", "minLength": 1},
+    "bug_version_id": {"type": "string", "minLength": 1},
+    "origin": {"enum": ["natural", "simulated", "unknown"]},
+    "score_kind": {"enum": ["margin", "probability_uncalibrated"]}
+  }
+}

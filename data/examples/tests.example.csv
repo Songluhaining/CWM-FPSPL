@@ -1,0 +1,7 @@
+system_id,bug_version_id,product_id,test_id,result,coverage_path,trace_path
+SyntheticA,synthetic-v1,p1,T1,FAIL,,
+SyntheticA,synthetic-v2,p1,T1,PASS,,
+SyntheticA,synthetic-v3,p1,T1,PASS,,
+SyntheticB,synthetic-v1,p1,T1,FAIL,,
+SyntheticB,synthetic-v2,p1,T1,PASS,,
+SyntheticB,synthetic-v3,p1,T1,PASS,,

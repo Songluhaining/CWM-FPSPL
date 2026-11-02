@@ -1,0 +1,5 @@
+# Python 3.11. Actual local acceptance: torch 2.6.0+cu126, numpy 2.4.6, CPU only.
+# Choose the torch CPU/CUDA wheel source only after checking the target server.
+# No driver installation, Java, BRFL, PyG or psutil is needed by this entry.
+torch==2.6.0
+numpy==2.4.6

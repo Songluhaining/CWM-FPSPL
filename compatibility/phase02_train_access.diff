@@ -1,0 +1,31 @@
+--- prepare_start/boundaries.py
++++ fit_and_later/boundaries.py
+@@ -32,7 +32,7 @@
+     return False
+ 
+ 
+-def install_io_guard(role: str, allowed_labels=()) -> None:
++def install_io_guard(role: str, allowed_labels=()) -> set[Path]:
+     allowed = {Path(p).resolve() for p in allowed_labels}
+     def hook(event, args):
+         if event != "open" or not isinstance(args[0], (str, bytes, os.PathLike)):
+@@ -49,3 +49,4 @@
+         elif forbidden_read(path, role, allowed):
+             raise PermissionError(f"{role} may not read sealed/oracle/legacy attributes: {path}")
+     sys.addaudithook(hook)
++    return allowed
+--- prepare_start/pipeline.py
++++ fit_and_later/pipeline.py
+@@ -123,9 +123,10 @@
+ 
+ 
+ def fit(c):
+-    allowed = [c["labels"] / fold / "train.csv" for fold in c["folds"]]
+-    install_io_guard("train", allowed)
++    allowed = install_io_guard("train")
+     for fold in c["folds"]:
++        allowed.clear()
++        allowed.add((c["labels"] / fold / "train.csv").resolve())
+         products, splits, ordered = context(c, fold)
+         raw = load_features(c, fold, ordered)
+         train = [i for i, k in enumerate(ordered) if splits[k]["split"] == "train"]

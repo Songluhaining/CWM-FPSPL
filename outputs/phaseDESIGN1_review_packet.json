@@ -1,0 +1,99 @@
+{
+  "stage_id": "DESIGN1",
+  "stage_status": "DESIGN_COMPLETE_IMPLEMENTATION_PENDING",
+  "design_id": "cwm_fp_design_v1",
+  "actual_scope": {
+    "activities": ["local_code_review", "primary_literature_review", "model_and_algorithm_design", "four_system_evaluation_design", "version_control_setup"],
+    "systems": ["BankAccountTP", "Email", "Elevator", "ExamDB"],
+    "bug_count": 1,
+    "new_data_collection": false,
+    "model_training": false,
+    "label_access": false,
+    "frozen_artifact_changes": false
+  },
+  "before_metrics": {
+    "provenance": "Inherited from phase04D1/04R1 and phase05C3A reports, not remeasured in DESIGN1",
+    "bank_admitted_products": 28,
+    "bank_admitted_versions": 16,
+    "bank_test_graphs": 463,
+    "email_local_transitions_admitted": 0,
+    "email_local_transition_candidates": 67
+  },
+  "after_metrics": {
+    "new_graphs": 0,
+    "new_admitted_products": 0,
+    "new_local_transitions": 0,
+    "new_model_scores": null,
+    "reason": "Design-only work; existing data and results were not regenerated."
+  },
+  "recovered_graphs": 0,
+  "admitted_products": {"new": 0, "historical_bank": 28, "new_four_system_count": null},
+  "rejection_reasons": {"new_evaluation": null, "reason": "No new graph admission executed."},
+  "split_readiness": {
+    "status": "DESIGNED_NOT_GENERATED",
+    "historical_splits_unchanged": true,
+    "new_protocols": ["four_system_version_grouped", "four_whole_system_holdout_folds"],
+    "validation_or_test_label_counts": null,
+    "reason": "No target files opened; new manifest and split generation is a later task."
+  },
+  "world_model_readiness": {
+    "status": "PARTIAL",
+    "shared_model_implemented": false,
+    "mandatory_recurrent_memory": false,
+    "T1": "Historical bounded graph evidence exists; no new certification.",
+    "T2": "Historical local observations are partial; new interface and heads are designed only.",
+    "T3": "No real intervention pairs.",
+    "causal_identification_proven": false,
+    "cross_system_evaluated_for_new_method": false
+  },
+  "tests_executed": {
+    "unit_tests": 0,
+    "java_tests": 0,
+    "model_runs": 0,
+    "reason": "No executable model or Java semantics changed; design/configuration and publication checks only.",
+    "python_files_syntax_parsed": 138,
+    "publication_secret_pattern_findings": 0,
+    "publication_audit": "outputs/design_v1_evidence/release_audit.json"
+  },
+  "resources": {
+    "execution_location": "local_workstation",
+    "gpu_used": false,
+    "training_seconds": 0,
+    "total_elapsed_seconds": null,
+    "peak_memory_bytes": null,
+    "reason_unmeasured": "Interactive reading and design were not profiled; no inferred training resource claims.",
+    "temporary_pdf_reader": "pypdf==5.1.0 installed only under ignored outputs/design_v1_evidence/pdf_reader",
+    "historical_experiment_environment_modified": false
+  },
+  "changed_files": [
+    "outputs/phaseDESIGN1_review_packet.md",
+    "outputs/phaseDESIGN1_review_packet.json",
+    "configs/model_design_v1.json",
+    "VERSION_CONTROL.md",
+    ".gitignore",
+    "README.md",
+    "PROJECT_SPEC.md",
+    "EVALUATION_PROTOCOL.md",
+    "STAGES.md",
+    "outputs/phase_status.md"
+  ],
+  "artifact_paths": {
+    "chinese_design": "outputs/phaseDESIGN1_review_packet.md",
+    "machine_design": "configs/model_design_v1.json",
+    "version_rules": "VERSION_CONTROL.md",
+    "local_review_evidence": "outputs/design_v1_evidence/",
+    "repository": "https://github.com/Songluhaining/CWM-FPSPL",
+    "product_status_csv": null,
+    "graph_status_csv": null,
+    "csv_reason": "No new product or graph processing in this design revision; do not manufacture empty experimental status tables."
+  },
+  "unresolved_issues": [
+    "Shared encoder, typed operand interface and numerical transition head are not implemented.",
+    "Field observations and relevant Java semantics need bounded implementation and parity validation.",
+    "Four-system benchmark label matching, manifests and new splits have not been produced.",
+    "Native baseline target-version context and inductive adaptation must be evaluated separately.",
+    "Auxiliary-transition benefit to classification and cross-system generalization is an untested hypothesis.",
+    "No intervention or causal-identification result exists."
+  ],
+  "recommended_next_stage": "Implement the unified interfaces and finite semantic acceptance; prepare the four-system baseline protocol in a new version without changing historical data."
+}

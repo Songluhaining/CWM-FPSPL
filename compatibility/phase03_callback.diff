@@ -1,0 +1,25 @@
+--- original/CallBackIndex.java
++++ bounded/CallBackIndex.java
+@@ -45,7 +45,7 @@
+     public int tsindex_object;
+ 
+     // threshold
+-    static int loglimit = 1200000;
++    static int loglimit = Integer.getInteger("cwm.maxEvents", 20000);
+     static int logcount = 0;
+ 
+     // ========== 1. 提供给 TraceTransformer 显式注入的 writer（Elevator 等环境用） ==========
+@@ -208,8 +208,11 @@
+     public static void logString(String s) {
+         logcount++;
+         if (logcount > loglimit) {
+-            System.exit(0);
+-        }
++            System.err.println("CWM_TRUNCATED_EVENT_LIMIT");
++            System.err.flush();
++            Runtime.getRuntime().halt(86);
++        }
++        if (s.trim().startsWith("opcode=")) s += ",thread=" + Thread.currentThread().getId();
+         writeLogString(s);
+     }
+ 

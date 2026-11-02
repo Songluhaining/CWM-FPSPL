@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "证据支持的程序指令身份，非源码语句身份",
+  "type": "object",
+  "required": [
+    "schema",
+    "provenance_type",
+    "scope",
+    "instruction_id",
+    "locator",
+    "opcode",
+    "generation_kind",
+    "source_line_id",
+    "source_granularity",
+    "source_statement_verified",
+    "evidence",
+    "evidence_sha256",
+    "unresolved_reason",
+    "alignment"
+  ],
+  "properties": {
+    "schema": {
+      "const": "program_identity_v1"
+    },
+    "provenance_type": {
+      "enum": [
+        "SOURCE_BACKED",
+        "COMPILER_GENERATED",
+        "UNRESOLVED"
+      ]
+    },
+    "scope": {
+      "enum": [
+        "product",
+        "test"
+      ]
+    },
+    "instruction_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "locator": {
+      "type": "object",
+      "required": [
+        "class_sha256",
+        "declaring_class",
+        "method",
+        "descriptor",
+        "bytecode_offset"
+      ]
+    },
+    "opcode": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 255
+    },
+    "source_statement_verified": {
+      "const": false
+    },
+    "source_granularity": {
+      "const": "source_line"
+    },
+    "evidence": {
+      "type": "object"
+    },
+    "evidence_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "source_line_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "generation_kind": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "unresolved_reason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "alignment": {
+      "type": "object"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "provenance_type": {
+            "enum": [
+              "SOURCE_BACKED",
+              "COMPILER_GENERATED"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "instruction_id": {
+            "type": "string",
+            "pattern": "^instruction-v1:[a-f0-9]{64}$"
+          },
+          "unresolved_reason": {
+            "type": "null"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "instruction_id": {
+            "type": "null"
+          },
+          "unresolved_reason": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "provenance_type": {
+            "const": "COMPILER_GENERATED"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "source_line_id": {
+            "type": "null"
+          },
+          "generation_kind": {
+            "enum": [
+              "default_constructor_receiver",
+              "default_constructor_super_call",
+              "default_constructor_return"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

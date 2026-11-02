@@ -1,0 +1,7 @@
+system_id,bug_version_id,product_id,observed_result,label,origin,source_variant_path,feature_config_path,test_suite_path,label_provenance
+SyntheticA,synthetic-v1,p1,FAIL,F,unknown,synthetic/src,synthetic/config,synthetic/test,synthetic_example
+SyntheticA,synthetic-v2,p1,PASS,FP,unknown,synthetic/src,synthetic/config,synthetic/test,synthetic_example
+SyntheticA,synthetic-v3,p1,PASS,TP,unknown,synthetic/src,synthetic/config,synthetic/test,synthetic_example
+SyntheticB,synthetic-v1,p1,FAIL,F,unknown,synthetic/src,synthetic/config,synthetic/test,synthetic_example
+SyntheticB,synthetic-v2,p1,PASS,FP,unknown,synthetic/src,synthetic/config,synthetic/test,synthetic_example
+SyntheticB,synthetic-v3,p1,PASS,TP,unknown,synthetic/src,synthetic/config,synthetic/test,synthetic_example

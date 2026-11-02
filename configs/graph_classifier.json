@@ -1,0 +1,16 @@
+{
+  "protocol": "strict_graph_v1",
+  "suite_view": "original",
+  "products": "data/processed/manifests/products.csv",
+  "tests": "data/processed/manifests/tests.csv",
+  "graphs": "data/processed/lddg/phase03_bank_v2/graphs.jsonl",
+  "split_dir": "data/processed/splits",
+  "labels": "data/processed/labels/full",
+  "folds": ["grouped", "loso_BankAccountTP", "loso_Email"],
+  "work_dir": "data/processed/graph_classifier/phase04_v2",
+  "limits": {"max_nodes": 512, "max_events": 128, "max_tests": 16, "max_edges": 4096},
+  "training": {"max_epochs": 100, "max_seconds": 60.0, "patience": 15, "batch_products": 8, "learning_rate": 0.01, "hidden": 16, "coverage_hidden": 32, "layers": 2, "max_parameters": 10000, "device": "cpu"},
+  "smoke_seeds": [20261030, 20261031, 20261032],
+  "smoke_max_seconds": 180,
+  "empirical_claims_allowed": false
+}

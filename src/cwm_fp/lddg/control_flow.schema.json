@@ -1,0 +1,333 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "oneOf": [
+    {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "required": [
+        "schema",
+        "proof",
+        "proof_sha256",
+        "assessment"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "normal_path_v1"
+        },
+        "proof_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "proof": {
+          "type": "object",
+          "required": [
+            "methods",
+            "events",
+            "execution_complete_and_consistent",
+            "test_outcome",
+            "trace_sha256",
+            "failure_types"
+          ],
+          "properties": {
+            "methods": {
+              "type": "array"
+            },
+            "events": {
+              "type": "array"
+            },
+            "execution_complete_and_consistent": {
+              "type": "boolean"
+            },
+            "test_outcome": {
+              "enum": [
+                "PASS",
+                "FAIL",
+                "UNKNOWN"
+              ]
+            },
+            "trace_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "failure_types": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "assessment": {
+          "type": "object",
+          "required": [
+            "accepted",
+            "classification",
+            "scope",
+            "exception_control_supported",
+            "errors",
+            "normal_transitions",
+            "handler_visits",
+            "certified_exception_transitions"
+          ],
+          "properties": {
+            "accepted": {
+              "type": "boolean"
+            },
+            "scope": {
+              "const": "normal-path-only"
+            },
+            "exception_control_supported": {
+              "const": false
+            },
+            "certified_exception_transitions": {
+              "const": 0
+            },
+            "errors": {
+              "type": "array"
+            },
+            "normal_transitions": {
+              "type": "array"
+            },
+            "handler_visits": {
+              "type": "array"
+            }
+          }
+        }
+      }
+    },
+    {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "required": [
+        "schema",
+        "proof",
+        "proof_sha256",
+        "assessment"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "null_field_exception_v1"
+        },
+        "proof_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "proof": {
+          "type": "object",
+          "required": [
+            "methods",
+            "events",
+            "execution_complete_and_consistent",
+            "test_outcome",
+            "trace_sha256",
+            "failure_types",
+            "raw_events",
+            "dataflow_sha256"
+          ],
+          "properties": {
+            "methods": {
+              "type": "array"
+            },
+            "events": {
+              "type": "array"
+            },
+            "execution_complete_and_consistent": {
+              "type": "boolean"
+            },
+            "test_outcome": {
+              "enum": [
+                "PASS",
+                "FAIL",
+                "UNKNOWN"
+              ]
+            },
+            "trace_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "failure_types": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "raw_events": {
+              "type": "array"
+            },
+            "dataflow_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          }
+        },
+        "assessment": {
+          "type": "object",
+          "required": [
+            "accepted",
+            "classification",
+            "scope",
+            "exception_control_supported",
+            "errors",
+            "normal_transitions",
+            "handler_visits",
+            "certified_exception_transitions",
+            "certified_transfers"
+          ],
+          "properties": {
+            "accepted": {
+              "type": "boolean"
+            },
+            "scope": {
+              "const": "normal-and-exact-null-field-catch"
+            },
+            "exception_control_supported": {
+              "const": false
+            },
+            "certified_exception_transitions": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "errors": {
+              "type": "array"
+            },
+            "normal_transitions": {
+              "type": "array"
+            },
+            "handler_visits": {
+              "type": "array"
+            },
+            "certified_transfers": {
+              "type": "array"
+            }
+          }
+        }
+      }
+    },
+    {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "required": [
+        "schema",
+        "proof",
+        "proof_sha256",
+        "assessment"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "framework_effect_v1"
+        },
+        "proof_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "proof": {
+          "type": "object",
+          "required": [
+            "methods",
+            "events",
+            "execution_complete_and_consistent",
+            "test_outcome",
+            "trace_sha256",
+            "failure_types",
+            "raw_events",
+            "dataflow_sha256",
+            "framework_evidence"
+          ],
+          "properties": {
+            "methods": {
+              "type": "array"
+            },
+            "events": {
+              "type": "array"
+            },
+            "execution_complete_and_consistent": {
+              "type": "boolean"
+            },
+            "test_outcome": {
+              "enum": [
+                "PASS",
+                "FAIL",
+                "UNKNOWN"
+              ]
+            },
+            "trace_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "failure_types": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "raw_events": {
+              "type": "array"
+            },
+            "dataflow_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "framework_evidence": {
+              "type": "object",
+              "required": [
+                "schema",
+                "trace_path",
+                "test_id",
+                "trace_sha256",
+                "jar",
+                "runtime",
+                "static_path",
+                "static_sha256",
+                "runtime_binding"
+              ]
+            }
+          }
+        },
+        "assessment": {
+          "type": "object",
+          "required": [
+            "accepted",
+            "classification",
+            "scope",
+            "exception_control_supported",
+            "errors",
+            "normal_transitions",
+            "handler_visits",
+            "certified_exception_transitions",
+            "certified_transfers"
+          ],
+          "properties": {
+            "accepted": {
+              "type": "boolean"
+            },
+            "scope": {
+              "const": "normal-and-exact-null-field-catch"
+            },
+            "exception_control_supported": {
+              "const": false
+            },
+            "certified_exception_transitions": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "errors": {
+              "type": "array"
+            },
+            "normal_transitions": {
+              "type": "array"
+            },
+            "handler_visits": {
+              "type": "array"
+            },
+            "certified_transfers": {
+              "type": "array"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

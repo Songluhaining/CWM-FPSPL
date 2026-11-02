@@ -1,0 +1,753 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "\u9636\u6bb503\u9010\u6d4b\u8bd5\u56fe\uff1bGRAPH\u662f\u5019\u9009\u7ed3\u6784\u7c7b\u578b\uff0c\u987b\u540c\u65f6\u68c0\u67e5quality\u4e0elearnable",
+  "type": "object",
+  "required": [
+    "system_id",
+    "bug_version_id",
+    "product_id",
+    "test_id",
+    "tier",
+    "nodes",
+    "edges",
+    "quality",
+    "provenance"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "system_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "bug_version_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "product_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "test_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tier": {
+      "const": "GRAPH"
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "attrs"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "enum": [
+              "feature",
+              "statement",
+              "value",
+              "assertion",
+              "output"
+            ]
+          },
+          "attrs": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "source",
+          "target",
+          "type",
+          "evidence",
+          "origin"
+        ],
+        "properties": {
+          "source": {
+            "type": "string"
+          },
+          "target": {
+            "type": "string"
+          },
+          "type": {
+            "enum": [
+              "feature_controls",
+              "control_dep",
+              "data_dep",
+              "produces",
+              "consumes",
+              "observes",
+              "temporal"
+            ]
+          },
+          "evidence": {
+            "enum": [
+              "static",
+              "dynamic"
+            ]
+          },
+          "event_index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "origin": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "quality": {
+      "type": "object",
+      "required": [
+        "eligible_graph_structure",
+        "canonical_mapping_complete",
+        "state_value_training_enabled",
+        "intervention_training_enabled"
+      ],
+      "properties": {
+        "eligible_graph_structure": {
+          "type": "boolean"
+        },
+        "canonical_mapping_complete": {
+          "type": "boolean"
+        },
+        "state_value_training_enabled": {
+          "const": false
+        },
+        "intervention_training_enabled": {
+          "const": false
+        },
+        "source_mapping_coverage": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "generated_identity_coverage": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "dynamic_event_identity_coverage": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "dynamic_product_identity_coverage": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "unresolved_identity_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unresolved_dynamic_event_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "dependency_semantics_valid": {
+          "type": "boolean"
+        },
+        "program_identity_complete": {
+          "type": "boolean"
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": [
+        "producer",
+        "extractor_version",
+        "coverage_only",
+        "learnable"
+      ],
+      "properties": {
+        "coverage_only": {
+          "const": false
+        },
+        "learnable": {
+          "type": "boolean"
+        }
+      }
+    },
+    "instruction_catalog": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "schema",
+          "provenance_type",
+          "scope",
+          "instruction_id",
+          "locator",
+          "opcode",
+          "generation_kind",
+          "source_line_id",
+          "source_granularity",
+          "source_statement_verified",
+          "evidence",
+          "evidence_sha256",
+          "unresolved_reason",
+          "alignment"
+        ],
+        "properties": {
+          "schema": {
+            "const": "program_identity_v1"
+          },
+          "provenance_type": {
+            "enum": [
+              "SOURCE_BACKED",
+              "COMPILER_GENERATED",
+              "UNRESOLVED"
+            ]
+          },
+          "scope": {
+            "enum": [
+              "product",
+              "test"
+            ]
+          },
+          "instruction_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "locator": {
+            "type": "object",
+            "required": [
+              "class_sha256",
+              "declaring_class",
+              "method",
+              "descriptor",
+              "bytecode_offset"
+            ]
+          },
+          "opcode": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 255
+          },
+          "source_statement_verified": {
+            "const": false
+          },
+          "source_granularity": {
+            "const": "source_line"
+          },
+          "evidence": {
+            "type": "object"
+          },
+          "evidence_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "source_line_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "generation_kind": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "unresolved_reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "alignment": {
+            "type": "object"
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "provenance_type": {
+                  "enum": [
+                    "SOURCE_BACKED",
+                    "COMPILER_GENERATED"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "instruction_id": {
+                  "type": "string",
+                  "pattern": "^instruction-v1:[a-f0-9]{64}$"
+                },
+                "unresolved_reason": {
+                  "type": "null"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "instruction_id": {
+                  "type": "null"
+                },
+                "unresolved_reason": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "provenance_type": {
+                  "const": "COMPILER_GENERATED"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "source_line_id": {
+                  "type": "null"
+                },
+                "generation_kind": {
+                  "enum": [
+                    "default_constructor_receiver",
+                    "default_constructor_super_call",
+                    "default_constructor_return"
+                  ]
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "control_flow_evidence": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "oneOf": [
+        {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "type": "object",
+          "required": [
+            "schema",
+            "proof",
+            "proof_sha256",
+            "assessment"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "schema": {
+              "const": "normal_path_v1"
+            },
+            "proof_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "proof": {
+              "type": "object",
+              "required": [
+                "methods",
+                "events",
+                "execution_complete_and_consistent",
+                "test_outcome",
+                "trace_sha256",
+                "failure_types"
+              ],
+              "properties": {
+                "methods": {
+                  "type": "array"
+                },
+                "events": {
+                  "type": "array"
+                },
+                "execution_complete_and_consistent": {
+                  "type": "boolean"
+                },
+                "test_outcome": {
+                  "enum": [
+                    "PASS",
+                    "FAIL",
+                    "UNKNOWN"
+                  ]
+                },
+                "trace_sha256": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "failure_types": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "assessment": {
+              "type": "object",
+              "required": [
+                "accepted",
+                "classification",
+                "scope",
+                "exception_control_supported",
+                "errors",
+                "normal_transitions",
+                "handler_visits",
+                "certified_exception_transitions"
+              ],
+              "properties": {
+                "accepted": {
+                  "type": "boolean"
+                },
+                "scope": {
+                  "const": "normal-path-only"
+                },
+                "exception_control_supported": {
+                  "const": false
+                },
+                "certified_exception_transitions": {
+                  "const": 0
+                },
+                "errors": {
+                  "type": "array"
+                },
+                "normal_transitions": {
+                  "type": "array"
+                },
+                "handler_visits": {
+                  "type": "array"
+                }
+              }
+            }
+          }
+        },
+        {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "type": "object",
+          "required": [
+            "schema",
+            "proof",
+            "proof_sha256",
+            "assessment"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "schema": {
+              "const": "null_field_exception_v1"
+            },
+            "proof_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "proof": {
+              "type": "object",
+              "required": [
+                "methods",
+                "events",
+                "execution_complete_and_consistent",
+                "test_outcome",
+                "trace_sha256",
+                "failure_types",
+                "raw_events",
+                "dataflow_sha256"
+              ],
+              "properties": {
+                "methods": {
+                  "type": "array"
+                },
+                "events": {
+                  "type": "array"
+                },
+                "execution_complete_and_consistent": {
+                  "type": "boolean"
+                },
+                "test_outcome": {
+                  "enum": [
+                    "PASS",
+                    "FAIL",
+                    "UNKNOWN"
+                  ]
+                },
+                "trace_sha256": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "failure_types": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "raw_events": {
+                  "type": "array"
+                },
+                "dataflow_sha256": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                }
+              }
+            },
+            "assessment": {
+              "type": "object",
+              "required": [
+                "accepted",
+                "classification",
+                "scope",
+                "exception_control_supported",
+                "errors",
+                "normal_transitions",
+                "handler_visits",
+                "certified_exception_transitions",
+                "certified_transfers"
+              ],
+              "properties": {
+                "accepted": {
+                  "type": "boolean"
+                },
+                "scope": {
+                  "const": "normal-and-exact-null-field-catch"
+                },
+                "exception_control_supported": {
+                  "const": false
+                },
+                "certified_exception_transitions": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "errors": {
+                  "type": "array"
+                },
+                "normal_transitions": {
+                  "type": "array"
+                },
+                "handler_visits": {
+                  "type": "array"
+                },
+                "certified_transfers": {
+                  "type": "array"
+                }
+              }
+            }
+          }
+        },
+        {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "type": "object",
+          "required": [
+            "schema",
+            "proof",
+            "proof_sha256",
+            "assessment"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "schema": {
+              "const": "framework_effect_v1"
+            },
+            "proof_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "proof": {
+              "type": "object",
+              "required": [
+                "methods",
+                "events",
+                "execution_complete_and_consistent",
+                "test_outcome",
+                "trace_sha256",
+                "failure_types",
+                "raw_events",
+                "dataflow_sha256",
+                "framework_evidence"
+              ],
+              "properties": {
+                "methods": {
+                  "type": "array"
+                },
+                "events": {
+                  "type": "array"
+                },
+                "execution_complete_and_consistent": {
+                  "type": "boolean"
+                },
+                "test_outcome": {
+                  "enum": [
+                    "PASS",
+                    "FAIL",
+                    "UNKNOWN"
+                  ]
+                },
+                "trace_sha256": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "failure_types": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "raw_events": {
+                  "type": "array"
+                },
+                "dataflow_sha256": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "framework_evidence": {
+                  "type": "object",
+                  "required": [
+                    "schema",
+                    "trace_path",
+                    "test_id",
+                    "trace_sha256",
+                    "jar",
+                    "runtime",
+                    "static_path",
+                    "static_sha256",
+                    "runtime_binding"
+                  ]
+                }
+              }
+            },
+            "assessment": {
+              "type": "object",
+              "required": [
+                "accepted",
+                "classification",
+                "scope",
+                "exception_control_supported",
+                "errors",
+                "normal_transitions",
+                "handler_visits",
+                "certified_exception_transitions",
+                "certified_transfers"
+              ],
+              "properties": {
+                "accepted": {
+                  "type": "boolean"
+                },
+                "scope": {
+                  "const": "normal-and-exact-null-field-catch"
+                },
+                "exception_control_supported": {
+                  "const": false
+                },
+                "certified_exception_transitions": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "errors": {
+                  "type": "array"
+                },
+                "normal_transitions": {
+                  "type": "array"
+                },
+                "handler_visits": {
+                  "type": "array"
+                },
+                "certified_transfers": {
+                  "type": "array"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "framework_effects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "event_index",
+          "accepted",
+          "reason",
+          "argument_value_ids",
+          "return_type",
+          "possible_writes",
+          "unknown_state",
+          "evidence_available_at"
+        ]
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "provenance": {
+            "required": [
+              "identity_schema"
+            ],
+            "properties": {
+              "identity_schema": {
+                "const": "program_identity_v1"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "instruction_catalog"
+        ],
+        "properties": {
+          "quality": {
+            "required": [
+              "source_mapping_coverage",
+              "generated_identity_coverage",
+              "unresolved_identity_count",
+              "dynamic_event_identity_coverage",
+              "dependency_semantics_valid",
+              "suite_completeness",
+              "program_identity_complete"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "provenance": {
+            "required": [
+              "control_schema"
+            ]
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "control_flow_evidence"
+        ],
+        "properties": {
+          "quality": {
+            "required": [
+              "normal_path_verified",
+              "control_semantics_scope",
+              "exception_path_classification",
+              "dynamic_dependency_emission"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

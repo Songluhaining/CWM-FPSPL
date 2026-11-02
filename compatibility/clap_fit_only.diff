@@ -1,0 +1,14 @@
+--- CLAP original classify_by_svm
++++ equivalent fit-only scope executed by baselines/vendor.py
+@@ -1,9 +1,4 @@
+-def classify_by_svm(logfile, classified_result_file, X_train, X_test, y_train, y_test, test_samples=[]):
++def fit_only(X_train, y_train):
+     clf = svm.SVC(kernel='linear')
+     clf.fit(X_train, y_train)
+-    y_pred = clf.predict(X_test)
+-
+-    logfile.write("Accuracy: " + str(metrics.accuracy_score(y_test, y_pred)) + "\n")
+-    overall_performance_measurement(y_test, y_pred, logfile)
+-    if len(test_samples) > 0:
+-        write_classified_result(y_pred, test_samples, 0, classified_result_file)
++    return clf

@@ -1,0 +1,32 @@
+project_name: CWM-FP
+seed: 20261030
+paths:
+  benchmark_root: data/raw/spl_benchmark_v2
+  clap_repo: third_party/CLAP
+  pulp_repo: third_party/PULP
+  instrumenter_repo: third_party/existing_instrumenter
+  prepared_data_root: data/processed
+  output_root: outputs
+capabilities:
+  coverage: true
+  static_control_dependence: false   # true only after actual adapter proves it
+  dynamic_def_use: false            # coverage XML is NOT dynamic def-use
+  runtime_values: false
+  test_inputs: false
+  executable_intervention_runner: false
+experiment:
+  start_system: BankAccountTP
+  split_strategy: grouped_version
+  holdout_system: null
+  graph_edge_types: [feature_controls, control_dep, data_dep, produces, consumes, observes, temporal]
+  use_fp_labels_for_world_model: false
+  use_fp_labels_for_supervised_head: true
+  allow_oracle_fault_locations_as_inputs: false
+  allow_simulated_removed_tests_as_actions: false
+model:
+  graph_encoder: rgcn
+  world_model: conditional_graph_transition
+  supervise_values_only_when_available: true
+  classifier_positive_label: FP
+  classifier_negative_label: TP
+  enable_rl: false

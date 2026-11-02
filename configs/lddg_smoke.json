@@ -1,0 +1,38 @@
+{
+  "producer_root": "E:/Myself/投稿/work7/FP-SPL/vendor/brfl",
+  "java_home": "E:/Program Files/Java/jdk-1.8",
+  "work_dir": "data/processed/lddg/phase03_bank_v2",
+  "system_id": "BankAccountTP",
+  "bug_version_id": "_MultipleBugs_.NOB_1.ID_1",
+  "max_seconds_per_test": 30,
+  "max_events": 20000,
+  "max_output_bytes": 33554432,
+  "java_heap_mb": 512,
+  "max_tests": 6,
+  "tests": [
+    [
+      "model_m_ca4_0001",
+      "main.Account_ESTest.test1"
+    ],
+    [
+      "model_m_ca4_0001",
+      "main.Account_ESTest.test4"
+    ],
+    [
+      "model_m_ca4_0002",
+      "main.Account_ESTest.test00"
+    ],
+    [
+      "model_m_ca4_0002",
+      "main.Transaction_ESTest.test5"
+    ],
+    [
+      "model_m_ca4_0003",
+      "main.Account_ESTest.test00"
+    ],
+    [
+      "model_m_ca4_0003",
+      "main.Transaction_ESTest.test5"
+    ]
+  ]
+}

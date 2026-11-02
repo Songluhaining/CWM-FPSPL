@@ -1,0 +1,27 @@
+schema_version: 1
+suite_view: original
+protocol: strict_train_reference_v1
+products: data/processed/manifests/products.csv
+tests: data/processed/manifests/tests.csv
+sources: configs/data_sources.local.json
+labels: data/processed/labels/full
+split_dir: data/processed/splits
+work_dir: data/processed/baselines/phase02_v1
+metrics_dir: outputs/metrics/phase02_v1
+folds: [grouped, loso_BankAccountTP, loso_Email]
+seeds: [20261030, 20261031, 20261032]
+c_grid: [0.1, 1.0, 10.0]
+models: [clap6_svm, pulp50_lr, pulp50_svm, pulp50_pu_source, coverage2_lr]
+pu_estimators: 30
+pu_sampling_ratio: 0.05
+bootstrap_replicates: 200
+bounds:
+  max_products: 3454
+  max_tests: 132758
+  max_versions: 109
+  max_seconds_per_command: 1800
+reference_policy: all_training_products_only_same_system
+reuse_observations: false
+paper_original_protocol:
+  status: unavailable
+  reasons: [missing_verified_823_subset, missing_four_systems, simulated_suite_not_isolated]
